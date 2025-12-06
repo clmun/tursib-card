@@ -14,6 +14,7 @@ class TursibCard extends HTMLElement {
     const width = this._config.card_width || "auto";
     const badgeWidth = this._config.badge_width || "3em";
     const destinationFontSize = this._config.destination_font_size || "14px";
+    const departureFontSize = this._config.departure_font_size || "16px";
     const minutesFontSize = this._config.minutes_font_size || "18px";
     const minutesColor = this._config.minutes_color || "green";
     const dividerThickness = this._config.divider_thickness || "2px";
@@ -27,7 +28,8 @@ class TursibCard extends HTMLElement {
           font-family: sans-serif;
           padding: 0.5em;
           height: ${height};
-          width: ${width};
+          max-width: ${width};   /* folosim max-width pentru control */
+          display: inline-block; /* forțăm să respecte width */
           overflow-y: auto;
         }
         .header {
@@ -67,6 +69,7 @@ class TursibCard extends HTMLElement {
         .departure {
           margin-left: 0.5em;
           font-weight: bold;
+          font-size: ${departureFontSize};
         }
         .minutes {
           margin-left: 0.5em;
