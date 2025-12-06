@@ -1,14 +1,19 @@
 class TursibCard extends HTMLElement {
   setConfig(config) {
     this._config = config;
+    this._selectedStation = config.default_station || Object.keys(config.entity_map)[0];
   }
 
   set hass(hass) {
-    const entity = hass.states[this._config.entity];
+    const entityMap = this._config.entity_map || {};
+    const options = Object.keys(entityMap);
+    const currentStation = this._selectedStation;
+
+    const entityId = entityMap[currentStation];
+    const entity = hass.states[entityId];
     if (!entity) return;
 
     const data = entity.attributes.departures || [];
-    const station = entity.attributes.station || "Stație necunoscută";
 
     const height = this._config.card_height || "auto";
     const width = this._config.card_width || "auto";
@@ -19,7 +24,6 @@ class TursibCard extends HTMLElement {
     const fallbackMinutesColor = this._config.minutes_color || "green";
     const dividerThickness = this._config.divider_thickness || "2px";
 
-    // 24h current time
     const now = new Date();
     const currentTime = now.toLocaleTimeString([], {
       hour: '2-digit',
@@ -43,16 +47,18 @@ class TursibCard extends HTMLElement {
           align-items: center;
           font-weight: bold;
           margin-bottom: 0.5em;
-          font-variant-numeric: tabular-nums; /* align numeric */
+        }
+        .station-select {
+          font-size: 14px;
+          padding: 0.2em;
         }
         .divider {
           border-bottom: ${dividerThickness} solid blue;
           margin-bottom: 0.5em;
         }
-        /* Grid: badge | destination | departure | minutes */
         .row {
           display: grid;
-          grid-template-columns: ${badgeWidth} 1fr 6ch 7ch; /* fixed character widths */
+          grid-template-columns: ${badgeWidth} 1fr 6ch 7ch;
           align-items: center;
           gap: 0.5em;
           margin: 0.3em 0;
@@ -82,13 +88,17 @@ class TursibCard extends HTMLElement {
         .minutes {
           font-weight: bold;
           font-size: ${minutesFontSize};
-          text-align: right; /* always right */
+          text-align: right;
           font-variant-numeric: tabular-nums;
         }
       </style>
       <div class="tursib-card">
         <div class="header">
-          <span>${station}</span>
+          <select class="station-select" id="stationSelect">
+            ${options.map(opt => `
+              <option value="${opt}" ${opt === currentStation ? "selected" : ""}>${opt}</option>
+            `).join("")}
+          </select>
           <span>${currentTime}</span>
         </div>
         <div class="divider"></div>
@@ -97,7 +107,6 @@ class TursibCard extends HTMLElement {
     data.forEach(dep => {
       const color = this._config.colors?.[dep.line] || "#007b00";
 
-      // dynamic minutes color
       let minutesColor = fallbackMinutesColor;
       if (dep.minutes === "Acum") {
         minutesColor = "red";
@@ -119,6 +128,17 @@ class TursibCard extends HTMLElement {
 
     html += `</div>`;
     this.innerHTML = html;
+
+    // Event listener pentru dropdown
+    setTimeout(() => {
+      const selectEl = this.querySelector("#stationSelect");
+      if (selectEl) {
+        selectEl.addEventListener("change", (e) => {
+          this._selectedStation = e.target.value;
+          this.hass = hass; // re-render card cu noul senzor
+        });
+      }
+    }, 0);
   }
 
   getCardSize() {
