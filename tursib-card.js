@@ -11,12 +11,13 @@ class TursibCard extends HTMLElement {
     const station = entity.attributes.station || "Stație necunoscută";
 
     const height = this._config.card_height || "auto";
+    const width = this._config.card_width || "auto";
     const badgeWidth = this._config.badge_width || "3em";
     const destinationFontSize = this._config.destination_font_size || "14px";
     const minutesFontSize = this._config.minutes_font_size || "18px";
+    const minutesColor = this._config.minutes_color || "green";
     const dividerThickness = this._config.divider_thickness || "2px";
 
-    // ora actuală
     const now = new Date();
     const currentTime = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
 
@@ -26,6 +27,7 @@ class TursibCard extends HTMLElement {
           font-family: sans-serif;
           padding: 0.5em;
           height: ${height};
+          width: ${width};
           overflow-y: auto;
         }
         .header {
@@ -65,7 +67,12 @@ class TursibCard extends HTMLElement {
         .departure {
           margin-left: 0.5em;
           font-weight: bold;
+        }
+        .minutes {
+          margin-left: 0.5em;
+          font-weight: bold;
           font-size: ${minutesFontSize};
+          color: ${minutesColor};
         }
       </style>
       <div class="tursib-card">
@@ -82,7 +89,8 @@ class TursibCard extends HTMLElement {
         <div class="row">
           <span class="line-badge" style="background:${color}">${dep.line}</span>
           <span class="destination">${dep.destination}</span>
-          <span class="departure">${dep.departure} (${dep.minutes} min)</span>
+          <span class="departure">${dep.departure}</span>
+          <span class="minutes">${dep.minutes} min</span>
         </div>
       `;
     });
