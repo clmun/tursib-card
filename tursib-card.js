@@ -1,77 +1,67 @@
 class TursibCard extends HTMLElement {
   setConfig(config) {
-    if (!config.entity) {
-      throw new Error("Trebuie să alegi un senzor (entity).");
-    }
-    this.config = {
-      colors: {
-        "11": "#2e7d32",
-        "1": "#FF4208",
-        "14": "#8412F6",
-        "217": "#f9a825",
-        "111": "#d32f2f",
-        "E7": "#1976d2",
-        ...config.colors
-      },
-      ...config
-    };
+    this._config = config;
   }
 
   set hass(hass) {
-    const root = this.shadowRoot || this.attachShadow({ mode: "open" });
-    root.innerHTML = "";
+    const entity = hass.states[this._config.entity];
+    if (!entity) return;
 
-    const card = document.createElement("ha-card");
-    card.style.padding = "12px";
-    card.style.borderRadius = "12px";
-    card.style.background = "var(--card-background-color)";
+    const data = entity.attributes.departures || [];
+    const height = this._config.card_height || "auto";
+    const badgeWidth = this._config.badge_width || "3em";
 
-    const entity = hass.states[this.config.entity];
-    if (!entity) {
-      card.innerHTML = "<p>Entity not found</p>";
-      root.appendChild(card);
-      return;
-    }
+    let html = `
+      <style>
+        .tursib-card {
+          font-family: sans-serif;
+          padding: 0.5em;
+          height: ${height};
+          overflow-y: auto;
+        }
+        .row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0.3em 0;
+        }
+        .line-badge {
+          display: inline-block;
+          width: ${badgeWidth};   /* configurabil din YAML */
+          text-align: center;
+          border-radius: 4px;
+          padding: 0.2em;
+          color: white;
+          font-weight: bold;
+        }
+        .destination {
+          flex: 1;
+          margin-left: 0.5em;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .departure {
+          margin-left: 0.5em;
+          font-weight: bold;
+        }
+      </style>
+      <div class="tursib-card">
+    `;
 
-    const departures = entity.attributes.departures || [];
-    departures.slice(0, 4).forEach(dep => {
-      const row = document.createElement("div");
-      row.style.display = "flex";
-      row.style.justifyContent = "space-between";
-      row.style.marginBottom = "6px";
-
-      // Linie
-      const line = document.createElement("div");
-      line.textContent = dep.line;
-      line.style.fontWeight = "bold";
-      line.style.color = "white";
-      line.style.padding = "4px 8px";
-      line.style.borderRadius = "6px";
-      line.style.backgroundColor = this.config.colors[dep.line] || "#FF3FFF";
-
-      // Destinație
-      const dest = document.createElement("div");
-      dest.textContent = dep.destination;
-      dest.style.fontSize = "12px";
-      dest.style.flex = "1";
-      dest.style.marginLeft = "10px";
-
-      // Minute
-      const minutes = document.createElement("div");
-      const min = dep.minutes;
-      minutes.innerHTML = `<span style="font-size:20px;font-weight:bold;color:green">${min} <span style="font-size:12px">min</span></span>`;
-
-      row.appendChild(line);
-      row.appendChild(dest);
-      row.appendChild(minutes);
-      card.appendChild(row);
+    data.forEach(dep => {
+      const color = this._config.colors?.[dep.line] || "#007b00";
+      html += `
+        <div class="row">
+          <span class="line-badge" style="background:${color}">${dep.line}</span>
+          <span class="destination">${dep.destination}</span>
+          <span class="departure">${dep.departure} (${dep.minutes} min)</span>
+        </div>
+      `;
     });
 
-    root.appendChild(card);
-  }
-
-  getConfigElement() {
-    return document.createElement("tursib-card-editor");
+    html += `</div>`;
+    this.innerHTML = html;
   }
 
   getCardSize() {
