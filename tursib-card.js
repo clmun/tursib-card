@@ -19,8 +19,13 @@ class TursibCard extends HTMLElement {
     const fallbackMinutesColor = this._config.minutes_color || "green";
     const dividerThickness = this._config.divider_thickness || "2px";
 
+    // 24h current time
     const now = new Date();
-    const currentTime = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    const currentTime = now.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
 
     let html = `
       <style>
@@ -38,14 +43,16 @@ class TursibCard extends HTMLElement {
           align-items: center;
           font-weight: bold;
           margin-bottom: 0.5em;
+          font-variant-numeric: tabular-nums; /* align numeric */
         }
         .divider {
           border-bottom: ${dividerThickness} solid blue;
           margin-bottom: 0.5em;
         }
+        /* Grid: badge | destination | departure | minutes */
         .row {
           display: grid;
-          grid-template-columns: ${badgeWidth} 1fr auto auto;
+          grid-template-columns: ${badgeWidth} 1fr 6ch 7ch; /* fixed character widths */
           align-items: center;
           gap: 0.5em;
           margin: 0.3em 0;
@@ -58,6 +65,7 @@ class TursibCard extends HTMLElement {
           padding: 0.2em;
           color: white;
           font-weight: bold;
+          font-variant-numeric: tabular-nums;
         }
         .destination {
           font-size: ${destinationFontSize};
@@ -69,11 +77,13 @@ class TursibCard extends HTMLElement {
           font-weight: bold;
           font-size: ${departureFontSize};
           text-align: right;
+          font-variant-numeric: tabular-nums;
         }
         .minutes {
           font-weight: bold;
           font-size: ${minutesFontSize};
-          text-align: right;
+          text-align: right; /* always right */
+          font-variant-numeric: tabular-nums;
         }
       </style>
       <div class="tursib-card">
@@ -87,7 +97,7 @@ class TursibCard extends HTMLElement {
     data.forEach(dep => {
       const color = this._config.colors?.[dep.line] || "#007b00";
 
-      // logica dinamică pentru culoarea minutelor
+      // dynamic minutes color
       let minutesColor = fallbackMinutesColor;
       if (dep.minutes === "Acum") {
         minutesColor = "red";
@@ -95,12 +105,14 @@ class TursibCard extends HTMLElement {
         minutesColor = "orange";
       }
 
+      const minutesText = dep.minutes === "Acum" ? "Acum" : `${dep.minutes} min`;
+
       html += `
         <div class="row">
           <span class="line-badge" style="background:${color}">${dep.line}</span>
           <span class="destination">${dep.destination}</span>
           <span class="departure">${dep.departure}</span>
-          <span class="minutes" style="color:${minutesColor}">${dep.minutes}${dep.minutes !== "Acum" ? " min" : ""}</span>
+          <span class="minutes" style="color:${minutesColor}">${minutesText}</span>
         </div>
       `;
     });
