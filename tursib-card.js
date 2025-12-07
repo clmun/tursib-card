@@ -81,15 +81,15 @@ class TursibCard extends HTMLElement {
           overflow: hidden;
           text-overflow: ellipsis;
         }
-        .minutes {
-          font-weight: bold;
-          font-size: ${minutesFontSize};
-          text-align: right;
-          font-variant-numeric: tabular-nums;
-        }
         .departure {
           font-weight: bold;
           font-size: ${departureFontSize};
+          text-align: right;
+          font-variant-numeric: tabular-nums;
+        }
+        .minutes {
+          font-weight: bold;
+          font-size: ${minutesFontSize};
           text-align: right;
           font-variant-numeric: tabular-nums;
         }
