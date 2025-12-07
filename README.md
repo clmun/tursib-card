@@ -5,9 +5,10 @@ Cardul utilizează datele furnizate de integrarea **[[Tursib Bus Departures]](ht
 Suportă selecția stației (dropdown sau butoane), layout fix sau fluid, culori configurabile și stil personalizat.
 
 ## 📸 Capturi de ecran
-Varianta cu dropdown
+### Varianta cu dropdown 
 ![Captură de ecran 1](https://raw.githubusercontent.com/clmun/tursib-card/master/images/Station_1.png)
-Varianta cu butoane
+
+### Varianta cu butoane
 ![Captură de ecran 2](https://raw.githubusercontent.com/clmun/tursib-card/master/images/Station_2.png)
 
 ## Instalare prin HACS
