@@ -46,7 +46,7 @@ class TursibCard extends HTMLElement {
     } else if (this._config.station_selector === "buttons") {
       selectorHtml = `
         <button id="prevStation">◀</button>
-        <span class="station-label" style="color:${stationLabelColor}">${currentStation}</span>
+        <span class="station-label">${currentStation}</span>
         <button id="nextStation">▶</button>
       `;
     }
@@ -76,11 +76,13 @@ class TursibCard extends HTMLElement {
           font-size: 14px;
           margin: 0 0.5em;
           font-weight: bold;
+          color: ${stationLabelColor}; /* aplicăm direct din YAML */
         }
         .divider {
           border-bottom: ${dividerThickness} solid blue;
           margin-bottom: 0.5em;
         }
+        /* Ordinea: linia | destinația | minutele | ora plecare */
         .row {
           display: grid;
           grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
