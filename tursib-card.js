@@ -16,8 +16,9 @@ class TursibCard extends HTMLElement {
     const data = entity.attributes.departures || [];
 
     const height = this._config.card_height || "auto";
-    const width = this._config.card_width || "auto";
+    const width = this._config.card_width || "400px";
     const badgeWidth = this._config.badge_width || "3em";
+    const destinationWidth = this._config.destination_width || "200px";
     const destinationFontSize = this._config.destination_font_size || "14px";
     const departureFontSize = this._config.departure_font_size || "16px";
     const minutesFontSize = this._config.minutes_font_size || "18px";
@@ -37,8 +38,8 @@ class TursibCard extends HTMLElement {
           font-family: sans-serif;
           padding: 0.5em;
           height: ${height};
-          max-width: ${width};
-          display: inline-block;
+          width: ${width};       /* lățime fixă */
+          box-sizing: border-box;
           overflow-y: auto;
         }
         .header {
@@ -58,7 +59,7 @@ class TursibCard extends HTMLElement {
         }
         .row {
           display: grid;
-          grid-template-columns: ${badgeWidth} 1fr 6ch 7ch;
+          grid-template-columns: ${badgeWidth} ${destinationWidth} 6ch 7ch; /* fixăm coloana destinație */
           align-items: center;
           gap: 0.5em;
           margin: 0.3em 0;
@@ -77,7 +78,7 @@ class TursibCard extends HTMLElement {
           font-size: ${destinationFontSize};
           white-space: nowrap;
           overflow: hidden;
-          text-overflow: ellipsis;
+          text-overflow: ellipsis; /* taie textul dacă depășește */
         }
         .departure {
           font-weight: bold;
@@ -129,7 +130,6 @@ class TursibCard extends HTMLElement {
     html += `</div>`;
     this.innerHTML = html;
 
-    // Event listener pentru dropdown
     setTimeout(() => {
       const selectEl = this.querySelector("#stationSelect");
       if (selectEl) {
