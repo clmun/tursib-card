@@ -66,6 +66,7 @@ class TursibCard extends HTMLElement {
         .row {
           display: grid;
           grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
+          gap: 0.8em;
         }
       `;
     } else { // fluid
