@@ -15,16 +15,18 @@ class TursibCard extends HTMLElement {
 
     const data = entity.attributes.departures || [];
 
+    // Config valori
     const height = this._config.card_height || "auto";
-    const width = this._config.card_width || "400px";
+    const width = this._config.card_width || "480px";
     const badgeWidth = this._config.badge_width || "3em";
-    const destinationWidth = this._config.destination_width || "200px";
-    const destinationFontSize = this._config.destination_font_size || "14px";
-    const departureFontSize = this._config.departure_font_size || "16px";
-    const minutesFontSize = this._config.minutes_font_size || "18px";
+    const destinationWidth = this._config.destination_width || "300px";
+    const destinationFontSize = this._config.destination_font_size || "10px";
+    const departureFontSize = this._config.departure_font_size || "10px";
+    const minutesFontSize = this._config.minutes_font_size || "12px";
     const fallbackMinutesColor = this._config.minutes_color || "green";
     const dividerThickness = this._config.divider_thickness || "2px";
-    const stationLabelColor = this._config.station_label_color || "#000"; // implicit negru
+    const stationLabelColor = this._config.station_label_color || "#000";
+    const layoutMode = this._config.layout_mode || "fixed"; // fixed sau fluid
 
     const now = new Date();
     const currentTime = now.toLocaleTimeString([], {
@@ -51,15 +53,43 @@ class TursibCard extends HTMLElement {
       `;
     }
 
-    let html = `
-      <style>
+    // CSS diferit pentru fixed vs fluid
+    let cardStyle = "";
+    if (layoutMode === "fixed") {
+      cardStyle = `
         .tursib-card {
-          font-family: sans-serif;
-          padding: 0.5em;
           height: ${height};
           width: ${width};
           box-sizing: border-box;
           overflow-y: auto;
+        }
+        .row {
+          display: grid;
+          grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
+        }
+      `;
+    } else { // fluid
+      cardStyle = `
+        .tursib-card {
+          height: auto;
+          width: 100%;
+          max-width: ${width};
+          box-sizing: border-box;
+          overflow-y: auto;
+        }
+        .row {
+          display: grid;
+          grid-template-columns: ${badgeWidth} 1fr 7ch 6ch;
+        }
+      `;
+    }
+
+    let html = `
+      <style>
+        ${cardStyle}
+        .tursib-card {
+          font-family: sans-serif;
+          padding: 0.5em;
         }
         .header {
           display: flex;
@@ -76,19 +106,11 @@ class TursibCard extends HTMLElement {
           font-size: 14px;
           margin: 0 0.5em;
           font-weight: bold;
-          color: ${stationLabelColor}; /* aplicăm direct din YAML */
+          color: ${stationLabelColor};
         }
         .divider {
           border-bottom: ${dividerThickness} solid blue;
           margin-bottom: 0.5em;
-        }
-        /* Ordinea: linia | destinația | minutele | ora plecare */
-        .row {
-          display: grid;
-          grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
-          align-items: center;
-          gap: 0.5em;
-          margin: 0.3em 0;
         }
         .line-badge {
           display: inline-block;
