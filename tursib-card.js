@@ -24,6 +24,7 @@ class TursibCard extends HTMLElement {
     const minutesFontSize = this._config.minutes_font_size || "18px";
     const fallbackMinutesColor = this._config.minutes_color || "green";
     const dividerThickness = this._config.divider_thickness || "2px";
+    const stationLabelColor = this._config.station_label_color || "#000"; // implicit negru
 
     const now = new Date();
     const currentTime = now.toLocaleTimeString([], {
@@ -42,17 +43,10 @@ class TursibCard extends HTMLElement {
           `).join("")}
         </select>
       `;
-    } else if (this._config.station_selector === "autocomplete") {
-      selectorHtml = `
-        <input list="stations" id="stationInput" value="${currentStation}" class="station-input">
-        <datalist id="stations">
-          ${options.map(opt => `<option value="${opt}">`).join("")}
-        </datalist>
-      `;
     } else if (this._config.station_selector === "buttons") {
       selectorHtml = `
         <button id="prevStation">◀</button>
-        <span class="station-label">${currentStation}</span>
+        <span class="station-label" style="color:${stationLabelColor}">${currentStation}</span>
         <button id="nextStation">▶</button>
       `;
     }
@@ -74,19 +68,19 @@ class TursibCard extends HTMLElement {
           font-weight: bold;
           margin-bottom: 0.5em;
         }
-        .station-select, .station-input {
+        .station-select {
           font-size: 14px;
           padding: 0.2em;
         }
         .station-label {
           font-size: 14px;
           margin: 0 0.5em;
+          font-weight: bold;
         }
         .divider {
           border-bottom: ${dividerThickness} solid blue;
           margin-bottom: 0.5em;
         }
-        /* Ordinea: linia | destinația | minutele | ora plecare */
         .row {
           display: grid;
           grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
@@ -156,20 +150,12 @@ class TursibCard extends HTMLElement {
     html += `</div>`;
     this.innerHTML = html;
 
-    // Event listeners pentru fiecare tip de selector
+    // Event listeners
     setTimeout(() => {
       if (this._config.station_selector === "dropdown") {
         const selectEl = this.querySelector("#stationSelect");
         if (selectEl) {
           selectEl.addEventListener("change", (e) => {
-            this._selectedStation = e.target.value;
-            this.hass = hass;
-          });
-        }
-      } else if (this._config.station_selector === "autocomplete") {
-        const inputEl = this.querySelector("#stationInput");
-        if (inputEl) {
-          inputEl.addEventListener("change", (e) => {
             this._selectedStation = e.target.value;
             this.hass = hass;
           });
