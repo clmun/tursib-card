@@ -32,6 +32,31 @@ class TursibCard extends HTMLElement {
       hour12: false
     });
 
+    // Alegem tipul de selector
+    let selectorHtml = "";
+    if (this._config.station_selector === "dropdown") {
+      selectorHtml = `
+        <select class="station-select" id="stationSelect">
+          ${options.map(opt => `
+            <option value="${opt}" ${opt === currentStation ? "selected" : ""}>${opt}</option>
+          `).join("")}
+        </select>
+      `;
+    } else if (this._config.station_selector === "autocomplete") {
+      selectorHtml = `
+        <input list="stations" id="stationInput" value="${currentStation}" class="station-input">
+        <datalist id="stations">
+          ${options.map(opt => `<option value="${opt}">`).join("")}
+        </datalist>
+      `;
+    } else if (this._config.station_selector === "buttons") {
+      selectorHtml = `
+        <button id="prevStation">◀</button>
+        <span class="station-label">${currentStation}</span>
+        <button id="nextStation">▶</button>
+      `;
+    }
+
     let html = `
       <style>
         .tursib-card {
@@ -49,9 +74,13 @@ class TursibCard extends HTMLElement {
           font-weight: bold;
           margin-bottom: 0.5em;
         }
-        .station-select {
+        .station-select, .station-input {
           font-size: 14px;
           padding: 0.2em;
+        }
+        .station-label {
+          font-size: 14px;
+          margin: 0 0.5em;
         }
         .divider {
           border-bottom: ${dividerThickness} solid blue;
@@ -81,26 +110,22 @@ class TursibCard extends HTMLElement {
           overflow: hidden;
           text-overflow: ellipsis;
         }
-        .departure {
-          font-weight: bold;
-          font-size: ${departureFontSize};
-          text-align: right;
-          font-variant-numeric: tabular-nums;
-        }
         .minutes {
           font-weight: bold;
           font-size: ${minutesFontSize};
           text-align: right;
           font-variant-numeric: tabular-nums;
         }
+        .departure {
+          font-weight: bold;
+          font-size: ${departureFontSize};
+          text-align: right;
+          font-variant-numeric: tabular-nums;
+        }
       </style>
       <div class="tursib-card">
         <div class="header">
-          <select class="station-select" id="stationSelect">
-            ${options.map(opt => `
-              <option value="${opt}" ${opt === currentStation ? "selected" : ""}>${opt}</option>
-            `).join("")}
-          </select>
+          ${selectorHtml}
           <span>${currentTime}</span>
         </div>
         <div class="divider"></div>
@@ -121,7 +146,7 @@ class TursibCard extends HTMLElement {
       html += `
         <div class="row">
           <span class="line-badge" style="background:${color}">${dep.line}</span>
-          <span class="destination">${dep.destination}</span>
+          <span class="destination" title="${dep.destination}">${dep.destination}</span>
           <span class="minutes" style="color:${minutesColor}">${minutesText}</span>
           <span class="departure">${dep.departure}</span>
         </div>
@@ -131,12 +156,36 @@ class TursibCard extends HTMLElement {
     html += `</div>`;
     this.innerHTML = html;
 
+    // Event listeners pentru fiecare tip de selector
     setTimeout(() => {
-      const selectEl = this.querySelector("#stationSelect");
-      if (selectEl) {
-        selectEl.addEventListener("change", (e) => {
-          this._selectedStation = e.target.value;
-          this.hass = hass; // re-render card cu noul senzor
+      if (this._config.station_selector === "dropdown") {
+        const selectEl = this.querySelector("#stationSelect");
+        if (selectEl) {
+          selectEl.addEventListener("change", (e) => {
+            this._selectedStation = e.target.value;
+            this.hass = hass;
+          });
+        }
+      } else if (this._config.station_selector === "autocomplete") {
+        const inputEl = this.querySelector("#stationInput");
+        if (inputEl) {
+          inputEl.addEventListener("change", (e) => {
+            this._selectedStation = e.target.value;
+            this.hass = hass;
+          });
+        }
+      } else if (this._config.station_selector === "buttons") {
+        const prevBtn = this.querySelector("#prevStation");
+        const nextBtn = this.querySelector("#nextStation");
+        if (prevBtn) prevBtn.addEventListener("click", () => {
+          const idx = options.indexOf(this._selectedStation);
+          this._selectedStation = options[(idx - 1 + options.length) % options.length];
+          this.hass = hass;
+        });
+        if (nextBtn) nextBtn.addEventListener("click", () => {
+          const idx = options.indexOf(this._selectedStation);
+          this._selectedStation = options[(idx + 1) % options.length];
+          this.hass = hass;
         });
       }
     }, 0);
