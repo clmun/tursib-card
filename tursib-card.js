@@ -27,6 +27,8 @@ class TursibCard extends HTMLElement {
     const dividerThickness = this._config.divider_thickness || "2px";
     const stationLabelColor = this._config.station_label_color || "#000";
     const layoutMode = this._config.layout_mode || "fixed"; // fixed sau fluid
+    const cardBackground = this._config.card_background || "#f9f9f9";
+    const cardRadius = this._config.card_radius || "12px";
 
     const now = new Date();
     const currentTime = now.toLocaleTimeString([], {
@@ -66,7 +68,6 @@ class TursibCard extends HTMLElement {
         .row {
           display: grid;
           grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
-          gap: 0.8em;
         }
       `;
     } else { // fluid
@@ -90,7 +91,10 @@ class TursibCard extends HTMLElement {
         ${cardStyle}
         .tursib-card {
           font-family: sans-serif;
-          padding: 0.5em;
+          padding: 0.8em;
+          background: ${cardBackground};
+          border-radius: ${cardRadius};
+          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
         .header {
           display: flex;
@@ -115,12 +119,12 @@ class TursibCard extends HTMLElement {
         }
         .row {
           align-items: center;
-          gap: 0.5em;
-          margin: 0.4em 0;       /* distanță între rânduri */
-          line-height: 1.4em;    /* previne suprapunerea textului */
+          column-gap: 1em;       /* distanță mai mare între badge și destinație */
+          margin: 0.4em 0;
+          line-height: 1.4em;
         }
         .line-badge {
-          flex-shrink: 0;        /* badge-ul nu se micșorează */
+          flex-shrink: 0;
           display: inline-block;
           width: ${badgeWidth};
           text-align: center;
