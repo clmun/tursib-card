@@ -1,14 +1,14 @@
 # Tursib Card
 
 Un card custom pentru Home Assistant Lovelace care afișează în timp real plecările din stațiile Tursib. 
-Cardul utilizează datele furnizate de integrarea [![Tursib Bus Departures] https://github.com/clmun/tursib ]
+Cardul utilizează datele furnizate de integrarea **[[Tursib Bus Departures]](https://github.com/clmun/tursib)** și oferă o interfață prietenoasă și personalizabilă.
 Suportă selecția stației (dropdown sau butoane), layout fix sau fluid, culori configurabile și stil personalizat.
 
 ## 📸 Capturi de ecran
 Varianta cu dropdown
-![Captură de ecran 1](https://raw.githubusercontent.com/clmun/tursib-card/main/images/Station1.png)
+![Captură de ecran 1](https://raw.githubusercontent.com/clmun/tursib-card/master/images/Station_1.png)
 Varianta cu butoane
-![Captură de ecran 2](https://raw.githubusercontent.com/clmun/tursib-card/main/images/Station2.png)
+![Captură de ecran 2](https://raw.githubusercontent.com/clmun/tursib-card/master/images/Station_2.png)
 
 ## Instalare prin HACS
 1. Adaugă repository-ul în HACS → Custom repositories → URL GitHub → tip **Dashboard**.
