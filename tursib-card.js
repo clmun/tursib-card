@@ -38,7 +38,7 @@ class TursibCard extends HTMLElement {
           font-family: sans-serif;
           padding: 0.5em;
           height: ${height};
-          width: ${width};       /* lățime fixă */
+          width: ${width};
           box-sizing: border-box;
           overflow-y: auto;
         }
@@ -57,9 +57,10 @@ class TursibCard extends HTMLElement {
           border-bottom: ${dividerThickness} solid blue;
           margin-bottom: 0.5em;
         }
+        /* Ordinea: linia | destinația | minutele | ora plecare */
         .row {
           display: grid;
-          grid-template-columns: ${badgeWidth} ${destinationWidth} 6ch 7ch; /* fixăm coloana destinație */
+          grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
           align-items: center;
           gap: 0.5em;
           margin: 0.3em 0;
@@ -78,17 +79,17 @@ class TursibCard extends HTMLElement {
           font-size: ${destinationFontSize};
           white-space: nowrap;
           overflow: hidden;
-          text-overflow: ellipsis; /* taie textul dacă depășește */
-        }
-        .departure {
-          font-weight: bold;
-          font-size: ${departureFontSize};
-          text-align: right;
-          font-variant-numeric: tabular-nums;
+          text-overflow: ellipsis;
         }
         .minutes {
           font-weight: bold;
           font-size: ${minutesFontSize};
+          text-align: right;
+          font-variant-numeric: tabular-nums;
+        }
+        .departure {
+          font-weight: bold;
+          font-size: ${departureFontSize};
           text-align: right;
           font-variant-numeric: tabular-nums;
         }
@@ -121,8 +122,8 @@ class TursibCard extends HTMLElement {
         <div class="row">
           <span class="line-badge" style="background:${color}">${dep.line}</span>
           <span class="destination">${dep.destination}</span>
-          <span class="departure">${dep.departure}</span>
           <span class="minutes" style="color:${minutesColor}">${minutesText}</span>
+          <span class="departure">${dep.departure}</span>
         </div>
       `;
     });
