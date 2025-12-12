@@ -216,6 +216,20 @@ class TursibCard extends HTMLElement {
   getCardSize() {
     return 3;
   }
+  // 🔧 Metodele pentru UI editor trebuie să fie aici, în interiorul clasei
+  getConfigElement() {
+    return document.createElement("tursib-card-editor");
+  }
+
+  getStubConfig() {
+    return {
+      type: "custom:tursib-card",
+      entity_map: {},
+      station_selector: "dropdown",
+      layout_mode: "fixed",
+      card_background: "#f9f9f9",
+      card_radius: "12px"
+    };
 }
 
 customElements.define("tursib-card", TursibCard);

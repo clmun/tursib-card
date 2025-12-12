@@ -1,29 +1,53 @@
 class TursibCardEditor extends HTMLElement {
   setConfig(config) {
     this._config = config;
+    this.render();
   }
 
-  connectedCallback() {
+  render() {
     this.innerHTML = `
       <div>
-        <label>Senzor stație:</label>
-        <input id="entity" type="text" value="${this._config.entity || ""}">
-        <br><br>
-        <label>Paleta culori (JSON):</label>
-        <textarea id="colors" rows="6" cols="40">${JSON.stringify(this._config.colors || {}, null, 2)}</textarea>
+        <label>Station selector</label>
+        <select id="station_selector">
+          <option value="dropdown" ${this._config.station_selector === "dropdown" ? "selected" : ""}>Dropdown</option>
+          <option value="buttons" ${this._config.station_selector === "buttons" ? "selected" : ""}>Buttons</option>
+        </select>
+      </div>
+      <div>
+        <label>Layout mode</label>
+        <select id="layout_mode">
+          <option value="fixed" ${this._config.layout_mode === "fixed" ? "selected" : ""}>Fixed</option>
+          <option value="fluid" ${this._config.layout_mode === "fluid" ? "selected" : ""}>Fluid</option>
+        </select>
+      </div>
+      <div>
+        <label>Background</label>
+        <input id="card_background" type="text" value="${this._config.card_background || "#f9f9f9"}">
+      </div>
+      <div>
+        <label>Radius</label>
+        <input id="card_radius" type="text" value="${this._config.card_radius || "12px"}">
       </div>
     `;
-    this.querySelector("#entity").addEventListener("change", ev => {
-      this._config.entity = ev.target.value;
+
+    this.querySelector("#station_selector").addEventListener("change", e => {
+      this._config.station_selector = e.target.value;
       this._updateConfig();
     });
-    this.querySelector("#colors").addEventListener("change", ev => {
-      try {
-        this._config.colors = JSON.parse(ev.target.value);
-        this._updateConfig();
-      } catch (e) {
-        console.error("Invalid JSON for colors");
-      }
+
+    this.querySelector("#layout_mode").addEventListener("change", e => {
+      this._config.layout_mode = e.target.value;
+      this._updateConfig();
+    });
+
+    this.querySelector("#card_background").addEventListener("input", e => {
+      this._config.card_background = e.target.value;
+      this._updateConfig();
+    });
+
+    this.querySelector("#card_radius").addEventListener("input", e => {
+      this._config.card_radius = e.target.value;
+      this._updateConfig();
     });
   }
 
