@@ -45,6 +45,8 @@ class TursibCard extends LitElement {
       minutes_font_size: "12px",
       minutes_color: "green",
       divider_thickness: "2px",
+      card_background: "transparent",
+      card_radius: "12px",
       colors: {}
     };
   }
@@ -70,7 +72,11 @@ class TursibCard extends LitElement {
 
     const style = `
       width: ${this._config.card_width};
+      background: ${this._config.card_background};
+      border-radius: ${this._config.card_radius};
       font-family: sans-serif;
+      padding: 0.8em;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     `;
 
     return html`

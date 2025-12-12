@@ -10,29 +10,48 @@ class TursibCardEditor extends LitElement {
   render() {
     if (!this._config) return html``;
 
+    const stations = Object.keys(this._config.entity_map || {});
     return html`
       <div class="form">
+        <!-- Default station -->
         <label>Default station</label>
-        <input type="text"
-               .value=${this._config.default_station || ""}
-               @input=${(e: any) => this._update("default_station", e.target.value)} />
+        <select @change=${(e: any) => this._update("default_station", e.target.value)}>
+          ${stations.map(
+            (s: string) => html`
+              <option value="${s}" ?selected=${this._config.default_station === s}>${s}</option>
+            `
+          )}
+        </select>
 
+        <!-- Layout mode -->
         <label>Layout mode</label>
         <select @change=${(e: any) => this._update("layout_mode", e.target.value)}>
           <option value="fixed" ?selected=${this._config.layout_mode === "fixed"}>Fixed</option>
           <option value="fluid" ?selected=${this._config.layout_mode === "fluid"}>Fluid</option>
         </select>
 
+        <!-- Station selector -->
         <label>Station selector</label>
         <select @change=${(e: any) => this._update("station_selector", e.target.value)}>
           <option value="dropdown" ?selected=${this._config.station_selector === "dropdown"}>Dropdown</option>
           <option value="buttons" ?selected=${this._config.station_selector === "buttons"}>Buttons</option>
         </select>
 
+        <!-- Visual settings -->
         <label>Station label color</label>
         <input type="color"
                .value=${this._config.station_label_color || "#0044cc"}
                @input=${(e: any) => this._update("station_label_color", e.target.value)} />
+
+        <label>Card background</label>
+        <input type="text"
+               .value=${this._config.card_background || "transparent"}
+               @input=${(e: any) => this._update("card_background", e.target.value)} />
+
+        <label>Card radius</label>
+        <input type="text"
+               .value=${this._config.card_radius || "12px"}
+               @input=${(e: any) => this._update("card_radius", e.target.value)} />
 
         <label>Card width</label>
         <input type="text"
