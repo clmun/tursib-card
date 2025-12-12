@@ -229,7 +229,7 @@ class TursibCard extends HTMLElement {
       layout_mode: "fixed",
       card_background: "#f9f9f9",
       card_radius: "12px"
-    };
+    }
 }
 
-customElements.define("tursib-card", TursibCard);
+customElements.define("tursib-card-dev", TursibCard);
