@@ -1,15 +1,11 @@
 import { LitElement, html, css } from "lit";
 
-// Tip simplu pentru Home Assistant; poți rafina ulterior
 type Hass = any;
 
 class TursibCard extends LitElement {
   static styles = css`
     .tursib-card {
-      font-family: sans-serif;
       padding: 0.8em;
-      background: var(--card-background-color, #f9f9f9);
-      border-radius: var(--card-radius, 12px);
       box-shadow: 0 2px 6px rgba(0,0,0,0.15);
     }
     .row {
@@ -25,14 +21,12 @@ class TursibCard extends LitElement {
     }
   `;
 
-  // Lovelace injectează `hass`
   public hass!: Hass;
-
   private _config: any = null;
   private _selectedStation: string = "";
 
   setConfig(config: any) {
-    if (!config || !config.entity_map) {
+    if (!config.entity_map) {
       throw new Error("You need to define entity_map");
     }
     this._config = { ...config };
@@ -47,7 +41,8 @@ class TursibCard extends LitElement {
       station_selector: "dropdown",
       layout_mode: "fixed",
       card_background: "#f9f9f9",
-      card_radius: "12px"
+      card_radius: "12px",
+      font_family: "sans-serif"
     };
   }
 
@@ -70,26 +65,31 @@ class TursibCard extends LitElement {
 
     const departures = st.attributes.departures || [];
 
+    // Stiluri dinamice din config
+    const style = `
+      background: ${this._config.card_background || "#f9f9f9"};
+      border-radius: ${this._config.card_radius || "12px"};
+      font-family: ${this._config.font_family || "sans-serif"};
+    `;
+
     return html`
-      <div class="tursib-card">
-        <div class="header">${station}</div>
-        ${departures.map(
-          (o: any) => html`
-            <div class="row">
-              <span>${o.line}</span>
-              <span>${o.destination}</span>
-              <span>${o.minutes} min</span>
-              <span>${o.departure}</span>
-            </div>
-          `
-        )}
-      </div>
+      <ha-card style="${style}">
+        <div class="tursib-card">
+          <div class="header">${station}</div>
+          ${departures.map(
+            (o: any) => html`
+              <div class="row">
+                <span>${o.line}</span>
+                <span>${o.destination}</span>
+                <span>${o.minutes} min</span>
+                <span>${o.departure}</span>
+              </div>
+            `
+          )}
+        </div>
+      </ha-card>
     `;
   }
 }
 
-// Important: înregistrăm fără export
 customElements.define("tursib-card", TursibCard);
-
-// Editorul poate fi în fișier separat; îl importăm aici ca side-effect
-import "./tursib-card-editor";

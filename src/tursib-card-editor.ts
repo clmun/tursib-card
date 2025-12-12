@@ -1,7 +1,7 @@
 import { LitElement, html } from "lit";
 
 class TursibCardEditor extends LitElement {
-  private _config: any = null;
+  private _config: any = {};
 
   setConfig(config: any) {
     this._config = { ...config };
@@ -13,66 +13,52 @@ class TursibCardEditor extends LitElement {
 
   render() {
     if (!this._config) return html``;
-    return html`
-      <div>
-        <label>Station selector</label>
-        <select @change=${this._stationSelectorChanged}>
-          <option
-            value="dropdown"
-            ?selected=${this._config.station_selector === "dropdown"}
-          >
-            Dropdown
-          </option>
-          <option
-            value="buttons"
-            ?selected=${this._config.station_selector === "buttons"}
-          >
-            Buttons
-          </option>
-        </select>
-      </div>
 
-      <div>
-        <label>Layout mode</label>
-        <select @change=${this._layoutModeChanged}>
-          <option
-            value="fixed"
-            ?selected=${this._config.layout_mode === "fixed"}
-          >
-            Fixed
-          </option>
-          <option
-            value="fluid"
-            ?selected=${this._config.layout_mode === "fluid"}
-          >
-            Fluid
-          </option>
+    return html`
+      <div class="form">
+        <!-- Station selector -->
+        <label>Station selector</label>
+        <select @change=${(e: any) => this._update("station_selector", e.target.value)}>
+          <option value="dropdown" ?selected=${this._config.station_selector === "dropdown"}>Dropdown</option>
+          <option value="buttons" ?selected=${this._config.station_selector === "buttons"}>Buttons</option>
         </select>
+
+        <!-- Layout mode -->
+        <label>Layout mode</label>
+        <select @change=${(e: any) => this._update("layout_mode", e.target.value)}>
+          <option value="fixed" ?selected=${this._config.layout_mode === "fixed"}>Fixed</option>
+          <option value="fluid" ?selected=${this._config.layout_mode === "fluid"}>Fluid</option>
+        </select>
+
+        <!-- Background color -->
+        <label>Background color</label>
+        <input type="color"
+               .value=${this._config.card_background || "#f9f9f9"}
+               @input=${(e: any) => this._update("card_background", e.target.value)} />
+
+        <!-- Border radius -->
+        <label>Border radius (px)</label>
+        <input type="number"
+               .value=${this._config.card_radius || 12}
+               @input=${(e: any) => this._update("card_radius", e.target.value)} />
+
+        <!-- Font family -->
+        <label>Font family</label>
+        <input type="text"
+               .value=${this._config.font_family || "sans-serif"}
+               @input=${(e: any) => this._update("font_family", e.target.value)} />
       </div>
     `;
   }
 
-  private _stationSelectorChanged(e: Event) {
-    const value = (e.target as HTMLSelectElement).value;
-    this._config = { ...this._config, station_selector: value };
-    this._updateConfig();
-  }
-
-  private _layoutModeChanged(e: Event) {
-    const value = (e.target as HTMLSelectElement).value;
-    this._config = { ...this._config, layout_mode: value };
-    this._updateConfig();
-  }
-
-  private _updateConfig() {
-    const ev = new CustomEvent("config-changed", {
+  private _update(key: string, value: any) {
+    this._config = { ...this._config, [key]: value };
+    this.dispatchEvent(new CustomEvent("config-changed", {
       detail: { config: this._config },
       bubbles: true,
       composed: true
-    });
-    this.dispatchEvent(ev);
+    }));
   }
 }
 
-// Important: înregistrăm fără export
 customElements.define("tursib-card-editor", TursibCardEditor);
