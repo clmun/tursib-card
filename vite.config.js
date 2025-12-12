@@ -2,14 +2,12 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   build: {
-    lib: {
-      entry: "src/tursib-card.ts",
-      name: "TursibCard",
-      fileName: "tursib-card"
-    },
     rollupOptions: {
+      input: "src/tursib-card.ts",
       output: {
-        format: "es"
+        format: "es",
+        entryFileNames: "tursib-card.js",
+        inlineDynamicImports: true
       }
     }
   }

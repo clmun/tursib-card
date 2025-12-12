@@ -1,33 +1,52 @@
 import { LitElement, html } from "lit";
-import { property } from "lit/decorators.js";
 
-export class TursibCardEditor extends LitElement {
-  @property({ attribute: false }) private _config!: any;
+class TursibCardEditor extends LitElement {
+  private _config: any = null;
 
-  public setConfig(config: any): void {
+  setConfig(config: any) {
     this._config = { ...config };
   }
 
-  public get config(): any {
+  get config() {
     return this._config;
   }
 
-  protected render() {
+  render() {
     if (!this._config) return html``;
-
     return html`
       <div>
         <label>Station selector</label>
         <select @change=${this._stationSelectorChanged}>
-          <option value="dropdown" ?selected=${this._config.station_selector === "dropdown"}>Dropdown</option>
-          <option value="buttons" ?selected=${this._config.station_selector === "buttons"}>Buttons</option>
+          <option
+            value="dropdown"
+            ?selected=${this._config.station_selector === "dropdown"}
+          >
+            Dropdown
+          </option>
+          <option
+            value="buttons"
+            ?selected=${this._config.station_selector === "buttons"}
+          >
+            Buttons
+          </option>
         </select>
       </div>
+
       <div>
         <label>Layout mode</label>
         <select @change=${this._layoutModeChanged}>
-          <option value="fixed" ?selected=${this._config.layout_mode === "fixed"}>Fixed</option>
-          <option value="fluid" ?selected=${this._config.layout_mode === "fluid"}>Fluid</option>
+          <option
+            value="fixed"
+            ?selected=${this._config.layout_mode === "fixed"}
+          >
+            Fixed
+          </option>
+          <option
+            value="fluid"
+            ?selected=${this._config.layout_mode === "fluid"}
+          >
+            Fluid
+          </option>
         </select>
       </div>
     `;
@@ -46,13 +65,14 @@ export class TursibCardEditor extends LitElement {
   }
 
   private _updateConfig() {
-    const event = new CustomEvent("config-changed", {
+    const ev = new CustomEvent("config-changed", {
       detail: { config: this._config },
       bubbles: true,
-      composed: true,
+      composed: true
     });
-    this.dispatchEvent(event);
+    this.dispatchEvent(ev);
   }
 }
 
+// Important: înregistrăm fără export
 customElements.define("tursib-card-editor", TursibCardEditor);
