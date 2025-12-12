@@ -1,6 +1,18 @@
+// Editor pentru UI
 class TursibCardEditor extends HTMLElement {
   setConfig(config) {
-    this._config = config;
+    this._config = config || {};
+    this.render();
+  }
+
+  get config() {
+    return this._config;
+  }
+
+  connectedCallback() {
+    if (!this._config) {
+      this._config = {};
+    }
     this.render();
   }
 
@@ -31,22 +43,22 @@ class TursibCardEditor extends HTMLElement {
     `;
 
     this.querySelector("#station_selector").addEventListener("change", e => {
-      this._config.station_selector = e.target.value;
+      this._config = { ...this._config, station_selector: e.target.value };
       this._updateConfig();
     });
 
     this.querySelector("#layout_mode").addEventListener("change", e => {
-      this._config.layout_mode = e.target.value;
+      this._config = { ...this._config, layout_mode: e.target.value };
       this._updateConfig();
     });
 
     this.querySelector("#card_background").addEventListener("input", e => {
-      this._config.card_background = e.target.value;
+      this._config = { ...this._config, card_background: e.target.value };
       this._updateConfig();
     });
 
     this.querySelector("#card_radius").addEventListener("input", e => {
-      this._config.card_radius = e.target.value;
+      this._config = { ...this._config, card_radius: e.target.value };
       this._updateConfig();
     });
   }

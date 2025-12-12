@@ -1,3 +1,5 @@
+import "./tursib-card-editor.js";
+
 class TursibCard extends HTMLElement {
   setConfig(config) {
     this._config = config;
@@ -224,12 +226,13 @@ class TursibCard extends HTMLElement {
   getStubConfig() {
     return {
       type: "custom:tursib-card",
-      entity_map: {},
+      entity_map: { "Default": "sensor.test" },
       station_selector: "dropdown",
       layout_mode: "fixed",
       card_background: "#f9f9f9",
       card_radius: "12px"
-    }
+    };
+  }
 }
 
 customElements.define("tursib-card", TursibCard);
