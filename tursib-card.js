@@ -232,4 +232,4 @@ class TursibCard extends HTMLElement {
     }
 }
 
-customElements.define("tursib-card-dev", TursibCard);
+customElements.define("tursib-card", TursibCard);
