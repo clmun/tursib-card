@@ -1,235 +1,192 @@
-class TursibCard extends HTMLElement {
+/**
+ * Tursib Card - Sibiu
+ * Versiune cu Editor UI Forțat
+ */
+
+console.info("%c TURSIB-CARD %c Versiune 1.0.5 ", "color: white; background: #255393; font-weight: 700;", "color: #255393; background: white; font-weight: 700;");
+
+// 1. Înregistrarea pentru Picker-ul vizual
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: "tursib-card",
+  name: "Tursib Sibiu Card",
+  description: "Afișează plecările Tursib Sibiu.",
+  preview: true
+});
+
+// 2. CLASA EDITOR (Configurație UI)
+class TursibCardEditor extends HTMLElement {
   setConfig(config) {
     this._config = config;
-    this._selectedStation = config.default_station || Object.keys(config.entity_map)[0];
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+  }
+
+  connectedCallback() {
+    this._render();
+  }
+
+  _render() {
+    if (!this._config) return;
+
+    // Folosim un template literal curat
+    this.innerHTML = `
+      <div id="editor-container" style="padding: 10px; display: flex; flex-direction: column; gap: 20px;">
+        <div class="field">
+          <label style="display: block; margin-bottom: 5px;">Titlu Card</label>
+          <ha-textfield
+            .label="${"Titlu"}"
+            .value="${this._config.title || ""}"
+            .configValue="${"title"}"
+            @input="${this._valueChanged}"
+            style="width: 100%;"
+          ></ha-textfield>
+        </div>
+
+        <div class="field">
+          <label style="display: block; margin-bottom: 5px;">Selector Stație</label>
+          <ha-select
+            fixedMenuPosition
+            naturalMenuWidth
+            .label="${"Tip Selector"}"
+            .value="${this._config.station_selector || "dropdown"}"
+            .configValue="${"station_selector"}"
+            @selected="${this._valueChanged}"
+            style="width: 100%;"
+          >
+            <mwc-list-item value="dropdown">Listă derulantă (Dropdown)</mwc-list-item>
+            <mwc-list-item value="buttons">Săgeți (◀ ▶)</mwc-list-item>
+          </ha-select>
+        </div>
+
+        <div class="field" style="background: #f0f0f0; padding: 10px; border-radius: 4px; color: #444; font-size: 13px;">
+          <strong>Notă:</strong> Stațiile (entity_map) se editează momentan doar în <strong>Code Editor (YAML)</strong>.
+        </div>
+      </div>
+    `;
+  }
+
+  _valueChanged(ev) {
+    if (!this._config || !this._hass) return;
+    const target = ev.target;
+    const configValue = target.configValue;
+    let newValue = target.value;
+
+    if (this._config[configValue] === newValue) return;
+
+    const newConfig = {
+      ...this._config,
+      [configValue]: newValue
+    };
+
+    // Evenimentul CRITIC care salvează datele în HA
+    const event = new CustomEvent("config-changed", {
+      detail: { config: newConfig },
+      bubbles: true,
+      composed: true,
+    });
+    this.dispatchEvent(event);
+  }
+}
+customElements.define("tursib-card-editor", TursibCardEditor);
+
+// 3. CLASA CARDULUI PRINCIPAL
+class TursibCard extends HTMLElement {
+  constructor() {
+    super();
+    this._selectedStation = null;
   }
 
   static getConfigElement() {
-  // Aceasta înregistrează tag-ul HTML pentru editor
     return document.createElement("tursib-card-editor");
   }
 
   static getStubConfig() {
-  // Aceasta oferă o configurație implicită când adaugi cardul prima dată
     return {
-      entity: "",
-      title: "Tursib Sibiu",
-      show_destination: true
+      title: "Tursib",
+      station_selector: "dropdown",
+      entity_map: { "Stație": "sensor.tursib_aumovio" }
     };
   }
 
+  setConfig(config) {
+    this._config = config;
+    if (!this._selectedStation && config.entity_map) {
+      this._selectedStation = config.default_station || Object.keys(config.entity_map)[0];
+    }
+  }
+
   set hass(hass) {
+    this._hass = hass;
+    if (!this._config) return;
+
     const entityMap = this._config.entity_map || {};
     const options = Object.keys(entityMap);
-    const currentStation = this._selectedStation;
-
+    const currentStation = this._selectedStation || options[0];
     const entityId = entityMap[currentStation];
-    const entity = hass.states[entityId];
-    if (!entity) return;
+    const stateObj = hass.states[entityId];
 
-    const data = entity.attributes.departures || [];
-
-    // Config valori
-    const height = this._config.card_height || "auto";
-    const width = this._config.card_width || "400px";
-    const badgeWidth = this._config.badge_width || "3em";
-    const destinationWidth = this._config.destination_width || "200px";
-    const destinationFontSize = this._config.destination_font_size || "14px";
-    const departureFontSize = this._config.departure_font_size || "16px";
-    const minutesFontSize = this._config.minutes_font_size || "18px";
-    const fallbackMinutesColor = this._config.minutes_color || "green";
-    const dividerThickness = this._config.divider_thickness || "2px";
-    const stationLabelColor = this._config.station_label_color || "#000";
-    const layoutMode = this._config.layout_mode || "fixed"; // fixed sau fluid
-    const cardBackground = this._config.card_background || "#f9f9f9";
-    const cardRadius = this._config.card_radius || "12px";
-
-    const now = new Date();
-    const currentTime = now.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-
-    // Alegem tipul de selector
-    let selectorHtml = "";
-    if (this._config.station_selector === "dropdown") {
-      selectorHtml = `
-        <select class="station-select" id="stationSelect">
-          ${options.map(opt => `
-            <option value="${opt}" ${opt === currentStation ? "selected" : ""}>${opt}</option>
-          `).join("")}
-        </select>
-      `;
-    } else if (this._config.station_selector === "buttons") {
-      selectorHtml = `
-        <button id="prevStation">◀</button>
-        <span class="station-label">${currentStation}</span>
-        <button id="nextStation">▶</button>
-      `;
+    if (!stateObj) {
+      this.innerHTML = `<ha-card style="padding:16px;">Entitate negăsită: ${entityId}</ha-card>`;
+      return;
     }
 
-    // CSS diferit pentru fixed vs fluid
-    let cardStyle = "";
-    if (layoutMode === "fixed") {
-      cardStyle = `
-        .tursib-card {
-          height: ${height};
-          width: ${width};
-          box-sizing: border-box;
-          overflow-y: auto;
-        }
-        .row {
-          display: grid;
-          grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
-        }
-      `;
-    } else { // fluid
-      cardStyle = `
-        .tursib-card {
-          height: auto;
-          width: 100%;
-          max-width: ${width};
-          box-sizing: border-box;
-          overflow-y: auto;
-        }
-        .row {
-          display: grid;
-          grid-template-columns: ${badgeWidth} 1fr 7ch 6ch;
-        }
-      `;
-    }
+    this._render(stateObj, options, currentStation);
+  }
 
-    let html = `
+  _render(stateObj, options, currentStation) {
+    const departures = stateObj.attributes.departures || [];
+    const title = this._config.title || "Tursib";
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    this.innerHTML = `
       <style>
-        ${cardStyle}
-        .tursib-card {
-          font-family: sans-serif;
-          padding: 0.8em;
-          background: ${cardBackground};
-          border-radius: ${cardRadius};
-          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-        .header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-weight: bold;
-          margin-bottom: 0.5em;
-        }
-        .station-select {
-          font-size: 14px;
-          padding: 0.2em;
-        }
-        .station-label {
-          font-size: 14px;
-          margin: 0 0.5em;
-          font-weight: bold;
-          color: ${stationLabelColor};
-        }
-        .divider {
-          border-bottom: ${dividerThickness} solid blue;
-          margin-bottom: 0.5em;
-        }
-        .row {
-          align-items: center;
-          column-gap: 1em;       /* distanță mai mare între badge și destinație */
-          margin: 0.4em 0;
-          line-height: 1.4em;
-        }
-        .line-badge {
-          flex-shrink: 0;
-          display: inline-block;
-          width: ${badgeWidth};
-          text-align: center;
-          border-radius: 4px;
-          padding: 0.2em;
-          color: white;
-          font-weight: bold;
-          font-variant-numeric: tabular-nums;
-        }
-        .destination {
-          font-size: ${destinationFontSize};
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .minutes {
-          font-weight: bold;
-          font-size: ${minutesFontSize};
-          text-align: right;
-          font-variant-numeric: tabular-nums;
-        }
-        .departure {
-          font-weight: bold;
-          font-size: ${departureFontSize};
-          text-align: right;
-          font-variant-numeric: tabular-nums;
-        }
+        .t-card { padding: 16px; }
+        .t-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .t-divider { height: 2px; background: #255393; margin-bottom: 10px; }
+        .t-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .t-badge { background: #007b00; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; width: 40px; text-align: center; }
+        .t-dest { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .t-min { font-weight: bold; }
+        select { padding: 4px; border-radius: 4px; }
       </style>
-      <div class="tursib-card">
-        <div class="header">
-          ${selectorHtml}
-          <span>${currentTime}</span>
+      <ha-card class="t-card">
+        <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px;">${title}</div>
+        <div class="t-header">
+          ${this._config.station_selector === 'buttons' ?
+            `<div><button id="p">◀</button> <b>${currentStation}</b> <button id="n">▶</button></div>` :
+            `<select id="s">${options.map(o => `<option value="${o}" ${o === currentStation ? 'selected' : ''}>${o}</option>`).join('')}</select>`
+          }
+          <span>${now}</span>
         </div>
-        <div class="divider"></div>
+        <div class="t-divider"></div>
+        ${departures.map(d => `
+          <div class="t-row">
+            <div class="t-badge">${d.line}</div>
+            <div class="t-dest">${d.destination}</div>
+            <div class="t-min">${d.minutes} min</div>
+          </div>
+        `).join('')}
+      </ha-card>
     `;
 
-    data.forEach(dep => {
-      const color = this._config.colors?.[dep.line] || "#007b00";
-
-      let minutesColor = fallbackMinutesColor;
-      if (dep.minutes === "Acum") {
-        minutesColor = "red";
-      } else if (!isNaN(dep.minutes) && Number(dep.minutes) < 3) {
-        minutesColor = "orange";
-      }
-
-      const minutesText = dep.minutes === "Acum" ? "Acum" : `${dep.minutes} min`;
-
-      html += `
-        <div class="row">
-          <span class="line-badge" style="background:${color}">${dep.line}</span>
-          <span class="destination" title="${dep.destination}">${dep.destination}</span>
-          <span class="minutes" style="color:${minutesColor}">${minutesText}</span>
-          <span class="departure">${dep.departure}</span>
-        </div>
-      `;
-    });
-
-    html += `</div>`;
-    this.innerHTML = html;
-
-    // Event listeners
-    setTimeout(() => {
-      if (this._config.station_selector === "dropdown") {
-        const selectEl = this.querySelector("#stationSelect");
-        if (selectEl) {
-          selectEl.addEventListener("change", (e) => {
-            this._selectedStation = e.target.value;
-            this.hass = hass;
-          });
-        }
-      } else if (this._config.station_selector === "buttons") {
-        const prevBtn = this.querySelector("#prevStation");
-        const nextBtn = this.querySelector("#nextStation");
-        if (prevBtn) prevBtn.addEventListener("click", () => {
-          const idx = options.indexOf(this._selectedStation);
-          this._selectedStation = options[(idx - 1 + options.length) % options.length];
-          this.hass = hass;
-        });
-        if (nextBtn) nextBtn.addEventListener("click", () => {
-          const idx = options.indexOf(this._selectedStation);
-          this._selectedStation = options[(idx + 1) % options.length];
-          this.hass = hass;
-        });
-      }
-    }, 0);
-  }
-
-  getCardSize() {
-    return 3;
+    // Event Listeners
+    const s = this.querySelector("#s");
+    if (s) s.onchange = (e) => { this._selectedStation = e.target.value; this.hass = this._hass; };
+    const p = this.querySelector("#p");
+    if (p) p.onclick = () => {
+        const i = options.indexOf(this._selectedStation);
+        this._selectedStation = options[(i - 1 + options.length) % options.length];
+        this.hass = this._hass;
+    };
+    const n = this.querySelector("#n");
+    if (n) n.onclick = () => {
+        const i = options.indexOf(this._selectedStation);
+        this._selectedStation = options[(i + 1) % options.length];
+        this.hass = this._hass;
+    };
   }
 }
-
 customElements.define("tursib-card", TursibCard);
