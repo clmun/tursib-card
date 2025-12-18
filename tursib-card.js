@@ -1,43 +1,235 @@
-const H=globalThis,D=H.ShadowRoot&&(H.ShadyCSS===void 0||H.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,j=Symbol(),W=new WeakMap;let tt=class{constructor(t,e,s){if(this._$cssResult$=!0,s!==j)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(D&&t===void 0){const s=e!==void 0&&e.length===1;s&&(t=W.get(e)),t===void 0&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),s&&W.set(e,t))}return t}toString(){return this.cssText}};const ot=n=>new tt(typeof n=="string"?n:n+"",void 0,j),ht=(n,...t)=>{const e=n.length===1?n[0]:t.reduce(((s,i,r)=>s+(o=>{if(o._$cssResult$===!0)return o.cssText;if(typeof o=="number")return o;throw Error("Value passed to 'css' function must be a 'css' function result: "+o+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+n[r+1]),n[0]);return new tt(e,n,j)},at=(n,t)=>{if(D)n.adoptedStyleSheets=t.map((e=>e instanceof CSSStyleSheet?e:e.styleSheet));else for(const e of t){const s=document.createElement("style"),i=H.litNonce;i!==void 0&&s.setAttribute("nonce",i),s.textContent=e.cssText,n.appendChild(s)}},q=D?n=>n:n=>n instanceof CSSStyleSheet?(t=>{let e="";for(const s of t.cssRules)e+=s.cssText;return ot(e)})(n):n;const{is:lt,defineProperty:ct,getOwnPropertyDescriptor:dt,getOwnPropertyNames:pt,getOwnPropertySymbols:ut,getPrototypeOf:$t}=Object,N=globalThis,J=N.trustedTypes,_t=J?J.emptyScript:"",ft=N.reactiveElementPolyfillSupport,E=(n,t)=>n,k={toAttribute(n,t){switch(t){case Boolean:n=n?_t:null;break;case Object:case Array:n=n==null?n:JSON.stringify(n)}return n},fromAttribute(n,t){let e=n;switch(t){case Boolean:e=n!==null;break;case Number:e=n===null?null:Number(n);break;case Object:case Array:try{e=JSON.parse(n)}catch{e=null}}return e}},et=(n,t)=>!lt(n,t),K={attribute:!0,type:String,converter:k,reflect:!1,useDefault:!1,hasChanged:et};Symbol.metadata??=Symbol("metadata"),N.litPropertyMetadata??=new WeakMap;let y=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=K){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const s=Symbol(),i=this.getPropertyDescriptor(t,s,e);i!==void 0&&ct(this.prototype,t,i)}}static getPropertyDescriptor(t,e,s){const{get:i,set:r}=dt(this.prototype,t)??{get(){return this[e]},set(o){this[e]=o}};return{get:i,set(o){const a=i?.call(this);r?.call(this,o),this.requestUpdate(t,a,s)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??K}static _$Ei(){if(this.hasOwnProperty(E("elementProperties")))return;const t=$t(this);t.finalize(),t.l!==void 0&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(E("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(E("properties"))){const e=this.properties,s=[...pt(e),...ut(e)];for(const i of s)this.createProperty(i,e[i])}const t=this[Symbol.metadata];if(t!==null){const e=litPropertyMetadata.get(t);if(e!==void 0)for(const[s,i]of e)this.elementProperties.set(s,i)}this._$Eh=new Map;for(const[e,s]of this.elementProperties){const i=this._$Eu(e,s);i!==void 0&&this._$Eh.set(i,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const s=new Set(t.flat(1/0).reverse());for(const i of s)e.unshift(q(i))}else t!==void 0&&e.push(q(t));return e}static _$Eu(t,e){const s=e.attribute;return s===!1?void 0:typeof s=="string"?s:typeof t=="string"?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise((t=>this.enableUpdating=t)),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach((t=>t(this)))}addController(t){(this._$EO??=new Set).add(t),this.renderRoot!==void 0&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const s of e.keys())this.hasOwnProperty(s)&&(t.set(s,this[s]),delete this[s]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return at(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach((t=>t.hostConnected?.()))}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach((t=>t.hostDisconnected?.()))}attributeChangedCallback(t,e,s){this._$AK(t,s)}_$ET(t,e){const s=this.constructor.elementProperties.get(t),i=this.constructor._$Eu(t,s);if(i!==void 0&&s.reflect===!0){const r=(s.converter?.toAttribute!==void 0?s.converter:k).toAttribute(e,s.type);this._$Em=t,r==null?this.removeAttribute(i):this.setAttribute(i,r),this._$Em=null}}_$AK(t,e){const s=this.constructor,i=s._$Eh.get(t);if(i!==void 0&&this._$Em!==i){const r=s.getPropertyOptions(i),o=typeof r.converter=="function"?{fromAttribute:r.converter}:r.converter?.fromAttribute!==void 0?r.converter:k;this._$Em=i;const a=o.fromAttribute(e,r.type);this[i]=a??this._$Ej?.get(i)??a,this._$Em=null}}requestUpdate(t,e,s){if(t!==void 0){const i=this.constructor,r=this[t];if(s??=i.getPropertyOptions(t),!((s.hasChanged??et)(r,e)||s.useDefault&&s.reflect&&r===this._$Ej?.get(t)&&!this.hasAttribute(i._$Eu(t,s))))return;this.C(t,e,s)}this.isUpdatePending===!1&&(this._$ES=this._$EP())}C(t,e,{useDefault:s,reflect:i,wrapped:r},o){s&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,o??e??this[t]),r!==!0||o!==void 0)||(this._$AL.has(t)||(this.hasUpdated||s||(e=void 0),this._$AL.set(t,e)),i===!0&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const t=this.scheduleUpdate();return t!=null&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[i,r]of this._$Ep)this[i]=r;this._$Ep=void 0}const s=this.constructor.elementProperties;if(s.size>0)for(const[i,r]of s){const{wrapped:o}=r,a=this[i];o!==!0||this._$AL.has(i)||a===void 0||this.C(i,void 0,r,a)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach((s=>s.hostUpdate?.())),this.update(e)):this._$EM()}catch(s){throw t=!1,this._$EM(),s}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach((e=>e.hostUpdated?.())),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach((e=>this._$ET(e,this[e]))),this._$EM()}updated(t){}firstUpdated(t){}};y.elementStyles=[],y.shadowRootOptions={mode:"open"},y[E("elementProperties")]=new Map,y[E("finalized")]=new Map,ft?.({ReactiveElement:y}),(N.reactiveElementVersions??=[]).push("2.1.1");const L=globalThis,M=L.trustedTypes,Z=M?M.createPolicy("lit-html",{createHTML:n=>n}):void 0,st="$lit$",_=`lit$${Math.random().toFixed(9).slice(2)}$`,it="?"+_,gt=`<${it}>`,m=document,w=()=>m.createComment(""),x=n=>n===null||typeof n!="object"&&typeof n!="function",I=Array.isArray,mt=n=>I(n)||typeof n?.[Symbol.iterator]=="function",R=`[
-\f\r]`,b=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,F=/-->/g,Y=/>/g,f=RegExp(`>|${R}(?:([^\\s"'>=/]+)(${R}*=${R}*(?:[^
-\f\r"'\`<>=]|("|')|))|$)`,"g"),G=/'/g,Q=/"/g,nt=/^(?:script|style|textarea|title)$/i,yt=n=>(t,...e)=>({_$litType$:n,strings:t,values:e}),O=yt(1),A=Symbol.for("lit-noChange"),d=Symbol.for("lit-nothing"),X=new WeakMap,g=m.createTreeWalker(m,129);function rt(n,t){if(!I(n)||!n.hasOwnProperty("raw"))throw Error("invalid template strings array");return Z!==void 0?Z.createHTML(t):t}const At=(n,t)=>{const e=n.length-1,s=[];let i,r=t===2?"<svg>":t===3?"<math>":"",o=b;for(let a=0;a<e;a++){const h=n[a];let c,p,l=-1,u=0;for(;u<h.length&&(o.lastIndex=u,p=o.exec(h),p!==null);)u=o.lastIndex,o===b?p[1]==="!--"?o=F:p[1]!==void 0?o=Y:p[2]!==void 0?(nt.test(p[2])&&(i=RegExp("</"+p[2],"g")),o=f):p[3]!==void 0&&(o=f):o===f?p[0]===">"?(o=i??b,l=-1):p[1]===void 0?l=-2:(l=o.lastIndex-p[2].length,c=p[1],o=p[3]===void 0?f:p[3]==='"'?Q:G):o===Q||o===G?o=f:o===F||o===Y?o=b:(o=f,i=void 0);const $=o===f&&n[a+1].startsWith("/>")?" ":"";r+=o===b?h+gt:l>=0?(s.push(c),h.slice(0,l)+st+h.slice(l)+_+$):h+_+(l===-2?a:$)}return[rt(n,r+(n[e]||"<?>")+(t===2?"</svg>":t===3?"</math>":"")),s]};class C{constructor({strings:t,_$litType$:e},s){let i;this.parts=[];let r=0,o=0;const a=t.length-1,h=this.parts,[c,p]=At(t,e);if(this.el=C.createElement(c,s),g.currentNode=this.el.content,e===2||e===3){const l=this.el.content.firstChild;l.replaceWith(...l.childNodes)}for(;(i=g.nextNode())!==null&&h.length<a;){if(i.nodeType===1){if(i.hasAttributes())for(const l of i.getAttributeNames())if(l.endsWith(st)){const u=p[o++],$=i.getAttribute(l).split(_),U=/([.?@])?(.*)/.exec(u);h.push({type:1,index:r,name:U[2],strings:$,ctor:U[1]==="."?bt:U[1]==="?"?Et:U[1]==="@"?St:T}),i.removeAttribute(l)}else l.startsWith(_)&&(h.push({type:6,index:r}),i.removeAttribute(l));if(nt.test(i.tagName)){const l=i.textContent.split(_),u=l.length-1;if(u>0){i.textContent=M?M.emptyScript:"";for(let $=0;$<u;$++)i.append(l[$],w()),g.nextNode(),h.push({type:2,index:++r});i.append(l[u],w())}}}else if(i.nodeType===8)if(i.data===it)h.push({type:2,index:r});else{let l=-1;for(;(l=i.data.indexOf(_,l+1))!==-1;)h.push({type:7,index:r}),l+=_.length-1}r++}}static createElement(t,e){const s=m.createElement("template");return s.innerHTML=t,s}}function v(n,t,e=n,s){if(t===A)return t;let i=s!==void 0?e._$Co?.[s]:e._$Cl;const r=x(t)?void 0:t._$litDirective$;return i?.constructor!==r&&(i?._$AO?.(!1),r===void 0?i=void 0:(i=new r(n),i._$AT(n,e,s)),s!==void 0?(e._$Co??=[])[s]=i:e._$Cl=i),i!==void 0&&(t=v(n,i._$AS(n,t.values),i,s)),t}class vt{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:s}=this._$AD,i=(t?.creationScope??m).importNode(e,!0);g.currentNode=i;let r=g.nextNode(),o=0,a=0,h=s[0];for(;h!==void 0;){if(o===h.index){let c;h.type===2?c=new P(r,r.nextSibling,this,t):h.type===1?c=new h.ctor(r,h.name,h.strings,this,t):h.type===6&&(c=new wt(r,this,t)),this._$AV.push(c),h=s[++a]}o!==h?.index&&(r=g.nextNode(),o++)}return g.currentNode=m,i}p(t){let e=0;for(const s of this._$AV)s!==void 0&&(s.strings!==void 0?(s._$AI(t,s,e),e+=s.strings.length-2):s._$AI(t[e])),e++}}class P{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,s,i){this.type=2,this._$AH=d,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=s,this.options=i,this._$Cv=i?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return e!==void 0&&t?.nodeType===11&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=v(this,t,e),x(t)?t===d||t==null||t===""?(this._$AH!==d&&this._$AR(),this._$AH=d):t!==this._$AH&&t!==A&&this._(t):t._$litType$!==void 0?this.$(t):t.nodeType!==void 0?this.T(t):mt(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==d&&x(this._$AH)?this._$AA.nextSibling.data=t:this.T(m.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:s}=t,i=typeof s=="number"?this._$AC(t):(s.el===void 0&&(s.el=C.createElement(rt(s.h,s.h[0]),this.options)),s);if(this._$AH?._$AD===i)this._$AH.p(e);else{const r=new vt(i,this),o=r.u(this.options);r.p(e),this.T(o),this._$AH=r}}_$AC(t){let e=X.get(t.strings);return e===void 0&&X.set(t.strings,e=new C(t)),e}k(t){I(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let s,i=0;for(const r of t)i===e.length?e.push(s=new P(this.O(w()),this.O(w()),this,this.options)):s=e[i],s._$AI(r),i++;i<e.length&&(this._$AR(s&&s._$AB.nextSibling,i),e.length=i)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const s=t.nextSibling;t.remove(),t=s}}setConnected(t){this._$AM===void 0&&(this._$Cv=t,this._$AP?.(t))}}class T{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,s,i,r){this.type=1,this._$AH=d,this._$AN=void 0,this.element=t,this.name=e,this._$AM=i,this.options=r,s.length>2||s[0]!==""||s[1]!==""?(this._$AH=Array(s.length-1).fill(new String),this.strings=s):this._$AH=d}_$AI(t,e=this,s,i){const r=this.strings;let o=!1;if(r===void 0)t=v(this,t,e,0),o=!x(t)||t!==this._$AH&&t!==A,o&&(this._$AH=t);else{const a=t;let h,c;for(t=r[0],h=0;h<r.length-1;h++)c=v(this,a[s+h],e,h),c===A&&(c=this._$AH[h]),o||=!x(c)||c!==this._$AH[h],c===d?t=d:t!==d&&(t+=(c??"")+r[h+1]),this._$AH[h]=c}o&&!i&&this.j(t)}j(t){t===d?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class bt extends T{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===d?void 0:t}}class Et extends T{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==d)}}class St extends T{constructor(t,e,s,i,r){super(t,e,s,i,r),this.type=5}_$AI(t,e=this){if((t=v(this,t,e,0)??d)===A)return;const s=this._$AH,i=t===d&&s!==d||t.capture!==s.capture||t.once!==s.once||t.passive!==s.passive,r=t!==d&&(s===d||i);i&&this.element.removeEventListener(this.name,this,s),r&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){typeof this._$AH=="function"?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class wt{constructor(t,e,s){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=s}get _$AU(){return this._$AM._$AU}_$AI(t){v(this,t)}}const xt=L.litHtmlPolyfillSupport;xt?.(C,P),(L.litHtmlVersions??=[]).push("3.3.1");const Ct=(n,t,e)=>{const s=e?.renderBefore??t;let i=s._$litPart$;if(i===void 0){const r=e?.renderBefore??null;s._$litPart$=i=new P(t.insertBefore(w(),r),r,void 0,e??{})}return i._$AI(n),i};const B=globalThis;class S extends y{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=Ct(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return A}}S._$litElement$=!0,S.finalized=!0,B.litElementHydrateSupport?.({LitElement:S});const Pt=B.litElementPolyfillSupport;Pt?.({LitElement:S});(B.litElementVersions??=[]).push("4.2.1");const V=class V extends S{constructor(){super(...arguments),this._config=null,this._selectedStation=""}setConfig(t){if(!t.entity_map)throw new Error("You need to define entity_map");this._config={...t},this._selectedStation=t.default_station||Object.keys(t.entity_map)[0]}static getStubConfig(){return{type:"custom:tursib-card",entity_map:{Default:"sensor.test"},default_station:"Default",layout_mode:"fixed",station_selector:"buttons",station_label_color:"#0044cc",card_width:"480px",badge_width:"3em",destination_width:"300px",destination_font_size:"10px",departure_font_size:"10px",minutes_font_size:"12px",minutes_color:"green",divider_thickness:"2px",card_background:"transparent",card_radius:"12px",colors:{}}}static async getConfigElement(){return document.createElement("tursib-card-editor")}getCardSize(){return 3}render(){if(!this._config||!this.hass)return O``;const t=this._config.entity_map||{},e=this._selectedStation,s=t[e],i=this.hass.states[s];if(!i)return O``;const r=i.attributes.departures||[],o=`
-      width: ${this._config.card_width};
-      background: ${this._config.card_background};
-      border-radius: ${this._config.card_radius};
-      font-family: sans-serif;
-      padding: 0.8em;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    `;return O`
-      <ha-card style="${o}">
-        <div class="header" style="color:${this._config.station_label_color}">
-          ${e}
+class TursibCard extends HTMLElement {
+  setConfig(config) {
+    this._config = config;
+    this._selectedStation = config.default_station || Object.keys(config.entity_map)[0];
+  }
+
+  static getConfigElement() {
+  // Aceasta înregistrează tag-ul HTML pentru editor
+    return document.createElement("tursib-card-editor");
+  }
+
+  static getStubConfig() {
+  // Aceasta oferă o configurație implicită când adaugi cardul prima dată
+    return {
+      entity: "",
+      title: "Tursib Sibiu",
+      show_destination: true
+    };
+  }
+
+  set hass(hass) {
+    const entityMap = this._config.entity_map || {};
+    const options = Object.keys(entityMap);
+    const currentStation = this._selectedStation;
+
+    const entityId = entityMap[currentStation];
+    const entity = hass.states[entityId];
+    if (!entity) return;
+
+    const data = entity.attributes.departures || [];
+
+    // Config valori
+    const height = this._config.card_height || "auto";
+    const width = this._config.card_width || "400px";
+    const badgeWidth = this._config.badge_width || "3em";
+    const destinationWidth = this._config.destination_width || "200px";
+    const destinationFontSize = this._config.destination_font_size || "14px";
+    const departureFontSize = this._config.departure_font_size || "16px";
+    const minutesFontSize = this._config.minutes_font_size || "18px";
+    const fallbackMinutesColor = this._config.minutes_color || "green";
+    const dividerThickness = this._config.divider_thickness || "2px";
+    const stationLabelColor = this._config.station_label_color || "#000";
+    const layoutMode = this._config.layout_mode || "fixed"; // fixed sau fluid
+    const cardBackground = this._config.card_background || "#f9f9f9";
+    const cardRadius = this._config.card_radius || "12px";
+
+    const now = new Date();
+    const currentTime = now.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+
+    // Alegem tipul de selector
+    let selectorHtml = "";
+    if (this._config.station_selector === "dropdown") {
+      selectorHtml = `
+        <select class="station-select" id="stationSelect">
+          ${options.map(opt => `
+            <option value="${opt}" ${opt === currentStation ? "selected" : ""}>${opt}</option>
+          `).join("")}
+        </select>
+      `;
+    } else if (this._config.station_selector === "buttons") {
+      selectorHtml = `
+        <button id="prevStation">◀</button>
+        <span class="station-label">${currentStation}</span>
+        <button id="nextStation">▶</button>
+      `;
+    }
+
+    // CSS diferit pentru fixed vs fluid
+    let cardStyle = "";
+    if (layoutMode === "fixed") {
+      cardStyle = `
+        .tursib-card {
+          height: ${height};
+          width: ${width};
+          box-sizing: border-box;
+          overflow-y: auto;
+        }
+        .row {
+          display: grid;
+          grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
+        }
+      `;
+    } else { // fluid
+      cardStyle = `
+        .tursib-card {
+          height: auto;
+          width: 100%;
+          max-width: ${width};
+          box-sizing: border-box;
+          overflow-y: auto;
+        }
+        .row {
+          display: grid;
+          grid-template-columns: ${badgeWidth} 1fr 7ch 6ch;
+        }
+      `;
+    }
+
+    let html = `
+      <style>
+        ${cardStyle}
+        .tursib-card {
+          font-family: sans-serif;
+          padding: 0.8em;
+          background: ${cardBackground};
+          border-radius: ${cardRadius};
+          box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-weight: bold;
+          margin-bottom: 0.5em;
+        }
+        .station-select {
+          font-size: 14px;
+          padding: 0.2em;
+        }
+        .station-label {
+          font-size: 14px;
+          margin: 0 0.5em;
+          font-weight: bold;
+          color: ${stationLabelColor};
+        }
+        .divider {
+          border-bottom: ${dividerThickness} solid blue;
+          margin-bottom: 0.5em;
+        }
+        .row {
+          align-items: center;
+          column-gap: 1em;       /* distanță mai mare între badge și destinație */
+          margin: 0.4em 0;
+          line-height: 1.4em;
+        }
+        .line-badge {
+          flex-shrink: 0;
+          display: inline-block;
+          width: ${badgeWidth};
+          text-align: center;
+          border-radius: 4px;
+          padding: 0.2em;
+          color: white;
+          font-weight: bold;
+          font-variant-numeric: tabular-nums;
+        }
+        .destination {
+          font-size: ${destinationFontSize};
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .minutes {
+          font-weight: bold;
+          font-size: ${minutesFontSize};
+          text-align: right;
+          font-variant-numeric: tabular-nums;
+        }
+        .departure {
+          font-weight: bold;
+          font-size: ${departureFontSize};
+          text-align: right;
+          font-variant-numeric: tabular-nums;
+        }
+      </style>
+      <div class="tursib-card">
+        <div class="header">
+          ${selectorHtml}
+          <span>${currentTime}</span>
         </div>
-        ${r.map(a=>O`
-            <div class="row" style="border-bottom:${this._config.divider_thickness} solid rgba(0,0,0,0.1)">
-              <span style="width:${this._config.badge_width}; color:${this._config.colors?.[a.line]||"black"}">
-                ${a.line}
-              </span>
-              <span style="width:${this._config.destination_width}; font-size:${this._config.destination_font_size}">
-                ${a.destination}
-              </span>
-              <span style="font-size:${this._config.minutes_font_size}; color:${this._config.minutes_color}">
-                ${a.minutes} min
-              </span>
-              <span style="font-size:${this._config.departure_font_size}">
-                ${a.departure}
-              </span>
-            </div>
-          `)}
-      </ha-card>
-    `}};V.styles=ht`
-    .row {
-      display: grid;
-      grid-template-columns: auto auto auto auto;
-      gap: 8px;
-      padding: 6px 0;
-    }
-    .header {
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-  `;let z=V;customElements.define("tursib-card",z);
+        <div class="divider"></div>
+    `;
+
+    data.forEach(dep => {
+      const color = this._config.colors?.[dep.line] || "#007b00";
+
+      let minutesColor = fallbackMinutesColor;
+      if (dep.minutes === "Acum") {
+        minutesColor = "red";
+      } else if (!isNaN(dep.minutes) && Number(dep.minutes) < 3) {
+        minutesColor = "orange";
+      }
+
+      const minutesText = dep.minutes === "Acum" ? "Acum" : `${dep.minutes} min`;
+
+      html += `
+        <div class="row">
+          <span class="line-badge" style="background:${color}">${dep.line}</span>
+          <span class="destination" title="${dep.destination}">${dep.destination}</span>
+          <span class="minutes" style="color:${minutesColor}">${minutesText}</span>
+          <span class="departure">${dep.departure}</span>
+        </div>
+      `;
+    });
+
+    html += `</div>`;
+    this.innerHTML = html;
+
+    // Event listeners
+    setTimeout(() => {
+      if (this._config.station_selector === "dropdown") {
+        const selectEl = this.querySelector("#stationSelect");
+        if (selectEl) {
+          selectEl.addEventListener("change", (e) => {
+            this._selectedStation = e.target.value;
+            this.hass = hass;
+          });
+        }
+      } else if (this._config.station_selector === "buttons") {
+        const prevBtn = this.querySelector("#prevStation");
+        const nextBtn = this.querySelector("#nextStation");
+        if (prevBtn) prevBtn.addEventListener("click", () => {
+          const idx = options.indexOf(this._selectedStation);
+          this._selectedStation = options[(idx - 1 + options.length) % options.length];
+          this.hass = hass;
+        });
+        if (nextBtn) nextBtn.addEventListener("click", () => {
+          const idx = options.indexOf(this._selectedStation);
+          this._selectedStation = options[(idx + 1) % options.length];
+          this.hass = hass;
+        });
+      }
+    }, 0);
+  }
+
+  getCardSize() {
+    return 3;
+  }
+}
+
+customElements.define("tursib-card", TursibCard);
