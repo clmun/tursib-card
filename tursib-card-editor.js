@@ -15,12 +15,18 @@ class TursibCardEditor extends HTMLElement {
   }
 
   async connectedCallback() {
-    // Force HA to load ha-entity-picker
+    // Force HA to load required custom elements (ha-switch, ha-entity-picker, etc.)
     try {
-      await customElements.whenDefined("hui-glance-card");
+      await Promise.all([
+        customElements.whenDefined("hui-glance-card"),
+        customElements.whenDefined("ha-switch"),
+        customElements.whenDefined("ha-entity-picker").catch(() => {}),
+      ]);
       const glance = document.createElement("hui-glance-card");
       if (glance.getConfigElement) await glance.getConfigElement();
-    } catch (e) {}
+    } catch (e) {
+      // Silently continue - editor should still work
+    }
     this._render();
   }
 
