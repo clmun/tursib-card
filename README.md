@@ -19,6 +19,8 @@ Suportă selecția stației (dropdown sau butoane), layout fix sau fluid, culori
 
 ## 📝 Configurare
 
+> Notă: editorul vizual nu este disponibil pentru acest card. Configurarea se face doar în YAML.
+
 Exemplu complet:
 ```yaml
 type: custom:tursib-card

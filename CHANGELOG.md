@@ -10,3 +10,4 @@
 
 ### Fixed
 - Improved card header rendering and visual styling for both fixed and fluid layouts.
+- Removed visual editor support so configuration is merged only through YAML.

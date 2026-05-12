@@ -1,256 +1,168 @@
 class TursibCard extends HTMLElement {
   setConfig(config) {
-    this._config = config;
-    this._selectedStation = config.default_station || Object.keys(config.entity_map)[0];
+    this._config = config || {};
+    this._selectedStation = null; // nu mai depindem de config
   }
 
   set hass(hass) {
-    const entityMap = this._config.entity_map || {};
-    const options = Object.keys(entityMap);
-    const currentStation = this._selectedStation;
+    const entityMap = this._config.entity_map || null;
 
-    const entityId = entityMap[currentStation];
+    // ✅ AUTO detect stations dacă nu există config
+    let options = [];
+    if (entityMap) {
+      options = Object.keys(entityMap);
+      this._selectedStation =
+        this._selectedStation || this._config.default_station || options[0];
+    } else {
+      // autodetect toate entity-urile tursib
+      options = Object.keys(hass.states)
+        .filter(e => e.startsWith("sensor.tursib_station"));
+
+      if (!options.length) return;
+
+      this._selectedStation = this._selectedStation || options[0];
+    }
+
+    // ✅ alegem entity
+    let entityId;
+    if (entityMap) {
+      entityId = entityMap[this._selectedStation];
+    } else {
+      entityId = this._selectedStation;
+    }
+
     const entity = hass.states[entityId];
     if (!entity) return;
 
     const data = entity.attributes.departures || [];
 
-    // Config valori
-    const cardTitle = this._config.card_title || this._config.title || "";
-    const titleColor = this._config.title_color || "#111";
+    // ✅ eliminate config heavy -> DEFAULTS SMART
+    const cardTitle = this._config.card_title || "Tursib";
     const showHeader = this._config.show_header !== false;
-    const showCurrentTime = this._config.show_current_time !== false;
-    const timeFormat = this._config.time_format || "24h";
-    const height = this._config.card_height || "auto";
-    const width = this._config.card_width || "400px";
-    const badgeWidth = this._config.badge_width || "3em";
-    const badgeTextColor = this._config.badge_text_color || "#fff";
-    const destinationWidth = this._config.destination_width || "200px";
-    const destinationFontSize = this._config.destination_font_size || "14px";
-    const departureFontSize = this._config.departure_font_size || "16px";
-    const minutesFontSize = this._config.minutes_font_size || "18px";
-    const fallbackMinutesColor = this._config.minutes_color || "green";
-    const dividerColor = this._config.divider_color || "blue";
-    const dividerThickness = this._config.divider_thickness || "2px";
-    const stationLabelColor = this._config.station_label_color || "#000";
-    const layoutMode = this._config.layout_mode || "fixed"; // fixed sau fluid
-    const cardBackground = this._config.card_background || "#f9f9f9";
-    const cardRadius = this._config.card_radius || "12px";
-    const showStationTitle = this._config.show_station_title !== false;
-    const rowGap = this._config.row_gap || "0.4em";
 
     const now = new Date();
     const currentTime = now.toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: timeFormat !== "24h"
+      hour12: false
     });
 
-    // Alegem tipul de selector
-    const selectorType = this._config.station_selector || "dropdown";
-    let selectorHtml = "";
-    if (selectorType === "dropdown") {
-      selectorHtml = `
-        <select class="station-select" id="stationSelect">
-          ${options.map(opt => `
-            <option value="${opt}" ${opt === currentStation ? "selected" : ""}>${opt}</option>
-          `).join("")}
-        </select>
-      `;
-    } else if (selectorType === "buttons") {
-      selectorHtml = `
-        <button id="prevStation">◀</button>
-        <span class="station-label">${currentStation}</span>
-        <button id="nextStation">▶</button>
-      `;
-    } else if (selectorType === "none" && showStationTitle) {
-      selectorHtml = `<span class="station-title">${currentStation}</span>`;
-    }
+    // ✅ selector simplu
+    const selectorHtml = `
+      <select id="stationSelect">
+        ${options.map(opt => `
+          <option value="${opt}" ${opt === this._selectedStation ? "selected" : ""}>
+            ${entityMap ? opt : hass.states[opt]?.attributes?.friendly_name || opt}
+          </option>
+        `).join("")}
+      </select>
+    `;
 
-    // CSS diferit pentru fixed vs fluid
-    let cardStyle = "";
-    if (layoutMode === "fixed") {
-      cardStyle = `
-        .tursib-card {
-          height: ${height};
-          width: ${width};
-          box-sizing: border-box;
-          overflow-y: auto;
-        }
-        .row {
-          display: grid;
-          grid-template-columns: ${badgeWidth} ${destinationWidth} 7ch 6ch;
-        }
-      `;
-    } else { // fluid
-      cardStyle = `
-        .tursib-card {
-          height: auto;
-          width: 100%;
-          max-width: ${width};
-          box-sizing: border-box;
-          overflow-y: auto;
-        }
-        .row {
-          display: grid;
-          grid-template-columns: ${badgeWidth} 1fr 7ch 6ch;
-        }
-      `;
-    }
+    // ✅ PALETĂ AUTOMATĂ (fără config)
+    const palette = ["#e74c3c", "#3498db", "#2ecc71", "#f1c40f", "#9b59b6", "#e67e22"];
 
-    const headerHtml = showHeader ? `
-      <div class="header">
-        <div class="header-left">
-          ${cardTitle ? `<div class="card-title">${cardTitle}</div>` : ""}
-          ${selectorHtml}
-        </div>
-        <div class="header-right">
-          ${showCurrentTime ? `<span class="current-time">${currentTime}</span>` : ""}
-        </div>
-      </div>
-      <div class="divider"></div>
-    ` : "";
+    const getLineColor = (line) => {
+      let hash = 0;
+      for (let i = 0; i < line.length; i++) {
+        hash += line.charCodeAt(i);
+      }
+      return palette[hash % palette.length];
+    };
+
+    // ✅ RULE ENGINE intern (ca smart-room)
+    const getRowStyle = (dep) => {
+      if (dep.minutes === "Acum") {
+        return "background:red; color:white;";
+      }
+      if (!isNaN(dep.minutes) && dep.minutes <= 3) {
+        return "background:orange; color:black;";
+      }
+      return "";
+    };
 
     let html = `
       <style>
-        ${cardStyle}
-        .tursib-card {
+        .card {
           font-family: sans-serif;
-          padding: 0.8em;
-          background: ${cardBackground};
-          border-radius: ${cardRadius};
+          padding: 12px;
+          border-radius: 14px;
+          background: #f9f9f9;
           box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
-        .header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 0.75em;
-          flex-wrap: wrap;
-          margin-bottom: 0.5em;
-        }
-        .header-left {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
-          gap: 0.5em;
-        }
-        .card-title {
-          font-size: 1rem;
-          font-weight: 700;
-          color: ${titleColor};
-          margin-right: 0.75em;
-        }
-        .header-right {
-          display: flex;
-          align-items: center;
-          gap: 0.75em;
-        }
-        .current-time {
-          font-size: 0.9rem;
-          color: #555;
-        }
-        .station-select {
-          font-size: 14px;
-          padding: 0.2em;
-        }
-        .station-label,
-        .station-title {
-          font-size: 14px;
-          margin: 0 0.5em;
-          font-weight: bold;
-          color: ${stationLabelColor};
-        }
-        .divider {
-          border-bottom: ${dividerThickness} solid ${dividerColor};
-          margin-bottom: 0.5em;
-        }
         .row {
+          display: grid;
+          grid-template-columns: 3em 1fr 6ch 6ch;
+          gap: 10px;
+          margin: 6px 0;
           align-items: center;
-          column-gap: 1em;       /* distanță mai mare între badge și destinație */
-          margin: ${rowGap} 0;
-          line-height: 1.4em;
         }
-        .line-badge {
-          flex-shrink: 0;
-          display: inline-block;
-          width: ${badgeWidth};
+        .badge {
           text-align: center;
-          border-radius: 4px;
-          padding: 0.2em;
+          border-radius: 6px;
           color: white;
           font-weight: bold;
-          font-variant-numeric: tabular-nums;
+          padding: 3px;
         }
         .destination {
-          font-size: ${destinationFontSize};
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
         .minutes {
-          font-weight: bold;
-          font-size: ${minutesFontSize};
           text-align: right;
-          font-variant-numeric: tabular-nums;
+          font-weight: bold;
         }
-        .departure {
-          font-weight: bold;
-          font-size: ${departureFontSize};
+        .time {
           text-align: right;
-          font-variant-numeric: tabular-nums;
+        }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 10px;
         }
       </style>
-      <div class="tursib-card">
-        ${headerHtml}
+
+      <div class="card">
+        ${showHeader ? `
+          <div class="header">
+            <div>
+              <strong>${cardTitle}</strong><br>
+              ${selectorHtml}
+            </div>
+            <div>${currentTime}</div>
+          </div>
+        ` : ""}
     `;
 
-    data.forEach(dep => {
-      const color = this._config.colors?.[dep.line] || "#007b00";
+    data.slice(0, 5).forEach(dep => {
 
-      let minutesColor = fallbackMinutesColor;
-      if (dep.minutes === "Acum") {
-        minutesColor = "red";
-      } else if (!isNaN(dep.minutes) && Number(dep.minutes) < 3) {
-        minutesColor = "orange";
-      }
+      const color = getLineColor(dep.line);
 
-      const minutesText = dep.minutes === "Acum" ? "Acum" : `${dep.minutes} min`;
+      const style = getRowStyle(dep);
+
+      const minutesText =
+        dep.minutes === "Acum" ? "Acum" : `${dep.minutes} min`;
 
       html += `
-        <div class="row">
-          <span class="line-badge" style="background:${color}; color:${badgeTextColor};">${dep.line}</span>
-          <span class="destination" title="${dep.destination}">${dep.destination}</span>
-          <span class="minutes" style="color:${minutesColor}">${minutesText}</span>
-          <span class="departure">${dep.departure}</span>
+        <div class="row" style="${style}">
+          <div class="badge" style="background:${color}">${dep.line}</div>
+          <div class="destination">${dep.destination}</div>
+          <div class="minutes">${minutesText}</div>
+          <div class="time">${dep.departure}</div>
         </div>
       `;
     });
 
     html += `</div>`;
+
     this.innerHTML = html;
 
-    // Event listeners
+    // ✅ event simplu
     setTimeout(() => {
-      if (this._config.station_selector === "dropdown") {
-        const selectEl = this.querySelector("#stationSelect");
-        if (selectEl) {
-          selectEl.addEventListener("change", (e) => {
-            this._selectedStation = e.target.value;
-            this.hass = hass;
-          });
-        }
-      } else if (this._config.station_selector === "buttons") {
-        const prevBtn = this.querySelector("#prevStation");
-        const nextBtn = this.querySelector("#nextStation");
-        if (prevBtn) prevBtn.addEventListener("click", () => {
-          const idx = options.indexOf(this._selectedStation);
-          this._selectedStation = options[(idx - 1 + options.length) % options.length];
-          this.hass = hass;
-        });
-        if (nextBtn) nextBtn.addEventListener("click", () => {
-          const idx = options.indexOf(this._selectedStation);
-          this._selectedStation = options[(idx + 1) % options.length];
+      const select = this.querySelector("#stationSelect");
+      if (select) {
+        select.addEventListener("change", (e) => {
+          this._selectedStation = e.target.value;
           this.hass = hass;
         });
       }
