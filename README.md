@@ -28,8 +28,22 @@ entity_map:
   "Aeroport": sensor.tursib_aeroport
 default_station: "Primăverii 1"
 
-# Selector stație: dropdown | buttons
+# Titlu card
+card_title: "Tursib Departures"
+
+# Selector stație: dropdown | buttons | none
 station_selector: buttons
+
+# Afișează / ascunde header și oră
+show_header: true
+show_current_time: true
+
+# Format oră: 24h | 12h
+time_format: 24h
+
+# Culoare titlu și text badge
+title_color: "#222222"
+badge_text_color: "#ffffff"
 
 # Culoare text pentru stația curentă (buttons)
 station_label_color: "#ff6600"
@@ -37,12 +51,27 @@ station_label_color: "#ff6600"
 # Layout: fixed | fluid
 layout_mode: fluid
 
+# Afișează eticheta stației când selectorul este oprit
+show_station_title: true
+
+# Spațiere între rânduri
+row_gap: 0.4em
+
 # Stil card
 card_background: "#ffffff"
 card_radius: 12px
 card_height: 220px
 card_width: 400px
+badge_width: 3em
 destination_width: 200px
+
+destination_font_size: 14px
+departure_font_size: 16px
+minutes_font_size: 18px
+
+minutes_color: green
+divider_color: blue
+divider_thickness: 2px
 
 # Culori pentru linii
 colors:
@@ -58,12 +87,27 @@ colors:
 | `default_station`     | string | prima stație | Stația afișată la încărcare                                  |
 | `station_selector`    | string | `dropdown`   | Tip selector: `dropdown` sau `buttons`                       |
 | `station_label_color` | string | `#000`       | Culoare text stație (buttons)                                |
+| `badge_text_color`    | string | `#fff`       | Culoare text pentru badge                                     |
+| `card_title`          | string | empty        | Titlul cardului afișat în header                             |
+| `title_color`         | string | `#111`       | Culoare text titlu                                           |
+| `show_header`         | bool   | `true`       | Afișează sau ascunde header-ul cardului                      |
+| `show_current_time`   | bool   | `true`       | Afișează sau ascunde ora curentă                             |
+| `time_format`         | string | `24h`        | Format oră: `24h` sau `12h`                                  |
+| `show_station_title`  | bool   | `true`       | Afișează eticheta stației când selectorul este `none`        |
 | `layout_mode`         | string | `fixed`      | `fixed` (dimensiuni rigide) sau `fluid` (compatibil Section) |
 | `card_background`     | string | `#f9f9f9`    | Fundal card                                                  |
 | `card_radius`         | string | `12px`       | Colțuri rotunjite                                            |
 | `card_height`         | string | `auto`       | Înălțime card                                                |
 | `card_width`          | string | `400px`      | Lățime card                                                  |
+| `badge_width`         | string | `3em`        | Lățime badge linie                                            |
 | `destination_width`   | string | `200px`      | Lățime coloană destinație (fixed)                            |
+| `destination_font_size` | string | `14px`     | Dimensiune text destinație                                   |
+| `departure_font_size` | string | `16px`       | Dimensiune text plecare                                      |
+| `minutes_font_size`   | string | `18px`       | Dimensiune text minute                                        |
+| `minutes_color`       | string | `green`      | Culoare implicită pentru minute                               |
+| `divider_color`       | string | `blue`       | Culoare linie separator                                       |
+| `divider_thickness`   | string | `2px`        | Grosimea liniei separator                                    |
+| `row_gap`             | string | `0.4em`      | Spațierea dintre rânduri                                      |
 | `colors`              | dict   | `#007b00`    | Culori pentru badge-uri de linie                             |
 
 ## 🚀 Funcționalități
